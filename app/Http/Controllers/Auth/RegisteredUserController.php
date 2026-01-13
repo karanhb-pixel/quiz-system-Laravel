@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AdminRequestMail;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -44,10 +46,10 @@ class RegisteredUserController extends Controller
         ]);
 
         if($user->role === 'pending_admin'){
-            // Mail::to('main-admin@example.com')->send(new AdminRequestMail($user));
+            Mail::to('main-admin@example.com')->send(new AdminRequestMail($user));
 
             // Temporary assinging admin strait after impliment mail logic
-            $user->role = 'admin';
+            // $user->role = 'admin';
         }
 
         event(new Registered($user));
