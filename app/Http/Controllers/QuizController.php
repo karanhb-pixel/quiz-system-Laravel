@@ -48,10 +48,20 @@ class QuizController extends Controller
                 'max:255'
             ],
             'category_id'=>[
-                'required',
+                'nullable',
                 'exists:categories,id'
             ]
-            ]);
+        ]);
+
+        // If "All Categories" is selected (empty value), use the first available category
+        if (empty($request->category_id)) {
+            $firstCategory = Category::first();
+            if ($firstCategory) {
+                $request->merge(['category_id' => $firstCategory->id]);
+            } else {
+                return back()->withErrors(['category_id' => 'No categories available. Please create a category first.']);
+            }
+        }
 
 
             $quiz = Quiz::create([

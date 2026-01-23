@@ -17,30 +17,29 @@
             @endif
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                @auth
-                    <form action="{{ route('quizzes.store') }}" method="POST">
-                        @csrf
-                        
-                        <div class="mb-4">
-                            <label class="block text-gray-700 mb-1">Quiz Name</label>
-                            <input type="text" name="title" class="border-gray-300 rounded shadow-sm w-full ">
-                            @error('title   ') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>              
-                        <div class="mb-4">
-                            <label class="block text-gray-700 mb-1">Select Category</label>
-                            <select name="category_id" class="border-gray-300 rounded shadow-sm w-full ">
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                @endforeach    
-                            </select>
-                            @error('category_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>              
+                <form action="{{ route('quizzes.store') }}" method="POST">
+                    @csrf
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-1">Quiz Name</label>
+                        <input type="text" name="title" class="border-gray-300 rounded shadow-sm w-full " placeholder="Enter quiz title (e.g., 'JavaScript Basics')">
+                        @error('title   ') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>              
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-1">Select Category</label>
+                        <select name="category_id" class="border-gray-300 rounded shadow-sm w-full ">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('category_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
 
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
-                            Create Quiz
-                        </button>
-                    </form>
-                @endauth
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
+                        Create Quiz
+                    </button>
+                </form>
 
                 <div class="flex justify-between mb-4 mt-8">
                     <h3 class="text-lg font-medium">All Quizzes</h3>

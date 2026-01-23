@@ -35,46 +35,69 @@ The Quiz System is built using the Laravel framework, which follows the Model-Vi
 2. **Presentation**: The system presents the quiz attempts in a user-friendly format, including the quiz title, score, and date.
 3. **Analysis**: Users can analyze their performance and track their progress over time.
 
-## Database Schema
+## 🗄️ Database Schema
 
-### Tables
+### Core Tables
 
 #### Users
-- **id**: Unique identifier for the user.
-- **name**: User's name.
-- **email**: User's email address.
-- **password**: User's password (hashed for security).
-- **role**: User's role (user or admin).
+- **id**: Primary key
+- **name**: User's full name
+- **email**: Unique email address
+- **password**: Bcrypt hashed password
+- **role**: User role (user/admin)
+- **email_verified_at**: Email verification timestamp
 
 #### Categories
-- **id**: Unique identifier for the category.
-- **name**: Category name.
-- **slug**: SEO-friendly URL slug for the category.
-- **description**: Category description.
-- **creator**: User who created the category.
+- **id**: Primary key
+- **name**: Category name
+- **slug**: SEO-friendly URL slug
+- **description**: Category description
+- **creator**: User who created the category
 
 #### Quizzes
-- **id**: Unique identifier for the quiz.
-- **title**: Quiz title.
-- **slug**: SEO-friendly URL slug for the quiz.
-- **user_id**: User who created the quiz (foreign key to Users table).
-- **category_id**: Category of the quiz (foreign key to Categories table).
+- **id**: Primary key
+- **title**: Quiz title
+- **slug**: SEO-friendly URL slug
+- **user_id**: Foreign key to Users
+- **category_id**: Foreign key to Categories
+- **description**: Quiz description
+- **time_limit**: Optional time limit in minutes
 
-#### Questions
-- **id**: Unique identifier for the question.
-- **quiz_id**: Quiz the question belongs to (foreign key to Quizzes table).
-- **question_text**: Question text.
-- **slug**: SEO-friendly URL slug for the question.
-- **a, b, c, d**: Answer options.
-- **correct_answer**: Correct answer option.
+### Advanced Features Tables
 
-#### Results
-- **id**: Unique identifier for the result.
-- **user_id**: User who attempted the quiz (foreign key to Users table).
-- **quiz_id**: Quiz that was attempted (foreign key to Quizzes table).
-- **total_questions**: Total number of questions in the quiz.
-- **correct_answers**: Number of correct answers.
-- **score_percentage**: User's score as a percentage.
+#### Question Banks
+- **id**: Primary key
+- **name**: Question bank name
+- **slug**: SEO-friendly URL slug
+- **description**: Bank description
+- **user_id**: Owner (foreign key to Users)
+- **category_id**: Category (foreign key to Categories)
+- **questions_per_quiz**: Default questions per quiz
+
+#### Question Types (Polymorphic)
+- **mcq_bank_questions**: Multiple choice questions
+  - question_text, option_a, option_b, option_c, option_d, correct_answer, points, difficulty
+- **fill_blank_bank_questions**: Fill-in-the-blank questions
+  - question_text, expected_answer, evaluation_hints, case_sensitive, points, difficulty
+- **code_bank_questions**: Programming questions
+  - question_text, expected_code, evaluation_criteria, language, points, difficulty
+
+#### Quiz Templates
+- **id**: Primary key
+- **name**: Template name
+- **description**: Template description
+- **user_id**: Creator (foreign key to Users)
+- **question_bank_id**: Source bank (foreign key to Question Banks)
+- **config**: JSON configuration (distribution, limits, settings)
+- **is_public**: Public visibility flag
+
+#### Quiz Attempts & Analytics
+- **bank_quiz_attempts**: Quiz attempt records
+  - user_id, question_bank_id, total_questions, total_points, points_earned, score_percentage, completed_at
+- **quiz_attempt_responses**: Detailed responses
+  - attempt_id, question_type, question_id, user_answer, is_correct, points_earned, ai_feedback, ai_confidence
+- **quiz_from_templates**: Template-generated quizzes
+  - quiz_template_id, bank_quiz_attempt_id, selected_questions (JSON)
 
 ## User Roles
 
@@ -90,48 +113,70 @@ The Quiz System is built using the Laravel framework, which follows the Model-Vi
 - **Manage Quizzes**: Admins can manage all quizzes, including those created by other users.
 - **Manage Categories**: Admins can manage all categories, including those created by other users.
 
-## API Endpoints
+## 🔗 API Endpoints
 
 ### Authentication
-- **POST /register**: Register a new user.
-- **POST /login**: Log in an existing user.
-- **POST /logout**: Log out the current user.
+- **POST /register**: Register a new user
+- **POST /login**: Authenticate user
+- **POST /logout**: End user session
+- **GET /profile**: Get user profile
+- **PATCH /profile**: Update user profile
 
-### Quizzes
-- **GET /quizzes**: List all quizzes.
-- **GET /quizzes/{quiz}**: Show a specific quiz.
-- **GET /quizzes/create**: Show the form to create a new quiz.
-- **POST /quizzes**: Store a new quiz.
-- **GET /quizzes/{quiz}/edit**: Show the form to edit a quiz.
-- **PUT/PATCH /quizzes/{quiz}**: Update a quiz.
-- **DELETE /quizzes/{quiz}**: Delete a quiz.
-- **GET /quiz/{quiz}/attempt**: Attempt a quiz.
-- **POST /quiz/{quiz}/submit**: Submit a quiz attempt.
+### Question Bank Management
+- **GET /question-banks**: List user's question banks
+- **POST /question-banks**: Create new question bank
+- **GET /question-banks/{bank}**: Show question bank details
+- **PUT /question-banks/{bank}**: Update question bank
+- **DELETE /question-banks/{bank}**: Delete question bank
+
+### Question Management (Nested)
+- **GET /question-banks/{bank}/questions/create/{type}**: Create question form
+- **POST /question-banks/{bank}/questions**: Store new question
+- **GET /question-banks/{bank}/questions/{question}/edit/{type}**: Edit question form
+- **PUT /question-banks/{bank}/questions/{question}/{type}**: Update question
+- **DELETE /question-banks/{bank}/questions/{question}/{type}**: Delete question
+
+### Quiz Templates
+- **GET /quiz-templates**: List available templates
+- **POST /quiz-templates**: Create new template
+- **GET /quiz-templates/{template}**: Show template details
+- **PUT /quiz-templates/{template}**: Update template
+- **DELETE /quiz-templates/{template}**: Delete template
+- **GET /quiz-templates/{template}/take**: Generate quiz from template
+
+### AI-Powered Quiz Attempts
+- **GET /question-banks/{bank}/start**: Start bank-based quiz
+- **POST /bank-quiz/{attempt}/submit**: Submit quiz answers
+- **GET /bank-quiz/{attempt}/result**: View quiz results
+- **GET /my-bank-attempts**: List user's quiz attempts
+
+### Analytics Dashboard
+- **GET /question-banks/{bank}/analytics**: Comprehensive analytics
+- **GET /{user}/attemptedQuiz**: User quiz history
+
+### Traditional Quizzes (Legacy)
+- **GET /quizzes**: List all quizzes
+- **GET /quizzes/{quiz}**: Show specific quiz
+- **GET /quizzes/create**: Create quiz form
+- **POST /quizzes**: Store new quiz
+- **GET /quizzes/{quiz}/edit**: Edit quiz form
+- **PUT/PATCH /quizzes/{quiz}**: Update quiz
+- **DELETE /quizzes/{quiz}**: Delete quiz
+- **GET /quiz/{quiz}/attempt**: Attempt quiz
+- **POST /quiz/{quiz}/submit**: Submit quiz answers
 
 ### Categories
-- **GET /categories**: List all categories.
-- **GET /categories/{category}**: Show a specific category.
-- **GET /categories/create**: Show the form to create a new category.
-- **POST /categories**: Store a new category.
-- **GET /categories/{category}/edit**: Show the form to edit a category.
-- **PUT/PATCH /categories/{category}**: Update a category.
-- **DELETE /categories/{category}**: Delete a category.
+- **GET /categories**: List all categories
+- **GET /categories/{category}**: Show category details
+- **GET /categories/create**: Create category form
+- **POST /categories**: Store new category
+- **GET /categories/{category}/edit**: Edit category form
+- **PUT/PATCH /categories/{category}**: Update category
+- **DELETE /categories/{category}**: Delete category
 
-### Questions
-- **GET /questions**: List all questions.
-- **GET /questions/{question}**: Show a specific question.
-- **GET /questions/create**: Show the form to create a new question.
-- **POST /questions**: Store a new question.
-- **GET /questions/{question}/edit**: Show the form to edit a question.
-- **PUT/PATCH /questions/{question}**: Update a question.
-- **DELETE /questions/{question}**: Delete a question.
-
-### Results
-- **GET /{user}/attemptedQuiz**: List all quiz attempts for a user.
-
-### Admin
-- **GET /admin/requests**: List all user registration requests.
-- **POST /admin/approve/{user}**: Approve a user registration request.
+### Administration
+- **GET /admin/requests**: List registration requests
+- **POST /admin/approve/{user}**: Approve user registration
 
 ## SEO-Friendly URLs
 The system uses SEO-friendly URLs to improve search engine rankings and user experience. URLs are generated using slugs instead of IDs, making them more readable and descriptive.
@@ -165,14 +210,49 @@ The system can be deployed to various environments, including:
 - **Staging**: For testing the application in a production-like environment.
 - **Production**: For deploying the application to end-users.
 
-## Future Enhancements
-Potential future enhancements to the Quiz System include:
+## 🚀 Implemented Features (Phase 4)
 
-- **Quiz Timer**: Add a timer to quizzes to limit the time users have to complete them.
-- **Quiz Categories**: Allow users to categorize their quizzes for better organization.
-- **Quiz Sharing**: Allow users to share their quizzes with others.
-- **Quiz Analytics**: Provide detailed analytics on quiz performance and user engagement.
-- **Quiz Export**: Allow users to export their quizzes and results in various formats.
+### ✅ AI-Powered Evaluation
+- Google Gemini API integration for intelligent question assessment
+- Contextual feedback for fill-in-the-blank and coding questions
+- Confidence scoring and detailed explanations
+
+### ✅ Advanced Analytics
+- Real-time performance metrics and trend analysis
+- Question difficulty assessment and success rate tracking
+- User engagement analytics and completion statistics
+- Interactive dashboards with data visualization
+
+### ✅ Question Bank System
+- Polymorphic question types (MCQ, Fill-blank, Code)
+- Difficulty classification and filtering
+- Bulk question management and organization
+- Advanced search and categorization
+
+### ✅ Quiz Templates
+- Configurable quiz generation parameters
+- Question distribution controls (type and difficulty ratios)
+- Public template sharing and community features
+- Usage tracking and popularity metrics
+
+### ✅ Performance Optimization
+- Intelligent caching system for question retrieval
+- Database indexing for high-performance queries
+- Scalable architecture for large user bases
+- Optimized quiz generation algorithms
+
+## 🔮 Future Enhancements
+
+### Phase 5+ Potential Features
+- **Mobile App**: React Native mobile application
+- **Real-time Collaboration**: Live quiz creation with multiple authors
+- **Advanced AI Features**: Predictive difficulty adjustment, personalized learning paths
+- **Integration APIs**: LMS integration (Moodle, Canvas), webhook support
+- **Gamification**: Badges, leaderboards, achievement systems
+- **Multi-language Support**: Internationalization and localization
+- **Video Questions**: Multimedia question types with video content
+- **Advanced Reporting**: Custom report generation and export (PDF, Excel)
+- **API Rate Limiting**: Advanced throttling and usage analytics
 
 ## Conclusion
 This technical documentation provides a comprehensive overview of the Quiz System, including its architecture, data flow, and user roles. It is intended for developers and technical users who want to understand the inner workings of the system and how to extend or modify it.

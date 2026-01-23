@@ -24,8 +24,17 @@
                     <li class="focus:outline-none hover:text-gray-700 cursor-pointerer">
                         <a href="{{ route('quizzes.index') }}" class="{{ request()->routeIs('quizzes.index') ? 'text-blue-600' : '' }}">Quiz</a>
                     </li>
-                    <li class="focus:outline-none hover:text-gray-700 cursor-pointerer"> 
+                    <li class="focus:outline-none hover:text-gray-700 cursor-pointerer">
                         <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.index') ? 'text-blue-600' : '' }}">Categories</a>
+                    </li>
+                    <li class="focus:outline-none hover:text-gray-700 cursor-pointerer">
+                        <a href="{{ route('question-banks.index') }}" class="{{ request()->routeIs('question-banks.*') ? 'text-blue-600' : '' }}">Question Banks</a>
+                    </li>
+                    <li class="focus:outline-none hover:text-gray-700 cursor-pointerer">
+                        <a href="{{ route('quiz-templates.index') }}" class="{{ request()->routeIs('quiz-templates.*') ? 'text-blue-600' : '' }}">Quiz Templates</a>
+                    </li>
+                    <li class="focus:outline-none hover:text-gray-700 cursor-pointerer">
+                        <a href="{{ route('ai-questions.metrics') }}" class="{{ request()->routeIs('ai-questions.metrics') ? 'text-blue-600' : '' }}">AI Metrics</a>
                     </li>
                     
                 </ul>
