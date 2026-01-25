@@ -24,10 +24,18 @@
                     <li class="focus:outline-none hover:text-gray-700 cursor-pointerer">
                         <a href="{{ route('quizzes.index') }}" class="{{ request()->routeIs('quizzes.index') ? 'text-blue-600' : '' }}">Quiz</a>
                     </li>
-                    <li class="focus:outline-none hover:text-gray-700 cursor-pointerer"> 
+                    <li class="focus:outline-none hover:text-gray-700 cursor-pointerer">
                         <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.index') ? 'text-blue-600' : '' }}">Categories</a>
                     </li>
                     
+                    @if(Auth::check() && Auth::user()->role === 'admin')
+                    <li class="focus:outline-none hover:text-gray-700 cursor-pointerer">
+                        <a href="{{ route('question-bank.form') }}" class="{{ request()->routeIs('question-bank.form') ? 'text-blue-600' : '' }}">AI Question Generator</a>
+                    </li>
+                    @endif
+                    <li class="focus:outline-none hover:text-gray-700 cursor-pointerer">
+                        <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.index') ? 'text-blue-600' : '' }}">Attempt Quiz</a>
+                    </li>
                 </ul>
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -129,6 +137,12 @@
                 <x-responsive-nav-link :href=" route('categories.index')">
                    Categories
                 </x-responsive-nav-link>
+
+                @if(Auth::user()->role === 'admin')
+                <x-responsive-nav-link :href="route('question-bank.form')">
+                   AI Question Generator
+                </x-responsive-nav-link>
+                @endif
 
                 <x-responsive-nav-link :href="route('userAttemptedQuiz',auth()->user()->name)">
                     User Quiz Attempts

@@ -12,7 +12,13 @@ class Question extends Model
     'question_text',
     'slug',
     'a', 'b', 'c', 'd', // Match the form names exactly
-    'correct_answer'
+    'correct_answer',
+    'generated_by_ai',
+    'topic',
+    'difficulty',
+    'question_type',
+    'category_id',
+    'hint'
     ];
 
   protected static function boot()

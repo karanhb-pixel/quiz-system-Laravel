@@ -64,24 +64,36 @@
                                             {{$category->quizzes_count}}
                                         </td>
                                         
-                                        <td class="px-6 py-4 pl-5 flex gap-2">
-                                            @auth
-                                                <form action="
-                                                {{ route('categories.destroy', $category->id) }}" 
-                                                method="POST" 
-                                                onsubmit="return confirm('Are you sure you want to delete this?')">
-                                                    @csrf
-                                                    @method('DELETE')
+                                            <td class="px-6 py-4 pl-5 flex gap-2">
+                                                @auth
+                                                    <form action="{{ route('categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-gray-500 hover:text-red-600 transition-colors" title="Delete Category">
+                                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </form>
                                                     
-                                                    <button type="submit" class="text-gray-500 hover:text-red-600 transition-colors">
-                                                        {{-- Your SVG Icon Starts Here --}}
-                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                    {{-- Manage/View My Quizzes --}}
+                                                    <a href="{{ route('categories.show', $category->id) }}" class="text-gray-500 hover:text-indigo-600 transition-colors" title="Manage My Quizzes">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="w-6 h-6" fill="currentColor">
+                                                            <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/>
                                                         </svg>
-                                                        {{-- Your SVG Icon Ends Here --}}
-                                                    </button>
-                                                </form>
-                                                <a href={{ route('categories.show',$category->id) }} class="text-gray-500 hover:text-indigo-600 transition-colors" title="View Quiz">
+                                                    </a>
+
+                                                    {{-- Attempt/View All Quizzes (User View) --}}
+                                                    <a href="{{ route('quizzes.category', $category->slug) }}" class="text-gray-500 hover:text-green-600 transition-colors" title="Attempt Quizzes">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    </a>
+                                                @endauth
+                                                
+                                                @guest
+                                                    <a href="{{ route('quizzes.category', $category->id) }}" class="text-gray-500 hover:text-indigo-600 transition-colors" title="View Quiz">
                                                     <svg xmlns="http://www.w3.org/2000/svg" 
                                                         viewBox="0 -960 960 960" 
                                                         class="w-6 h-6" 
@@ -89,19 +101,8 @@
                                                         <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/>
                                                     </svg>
                                                 </a>
-                                            @endauth
-                                            
-                                            @guest
-                                                <a href={{ route('quizzes.category',$category->id) }} class="text-gray-500 hover:text-indigo-600 transition-colors" title="View Quiz">
-                                                <svg xmlns="http://www.w3.org/2000/svg" 
-                                                    viewBox="0 -960 960 960" 
-                                                    class="w-6 h-6" 
-                                                    fill="currentColor">
-                                                    <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/>
-                                                </svg>
-                                            </a>
-                                            @endguest
-                                        </td>
+                                                @endguest
+                                            </td>
                                             
                                 </tr>
                                 @empty

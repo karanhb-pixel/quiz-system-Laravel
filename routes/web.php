@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QuestionBankController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\UserController;
@@ -43,6 +44,11 @@ Route::middleware('auth')->group(function () {
         ->name('quizzes.attempt');
     Route::post('/quiz/{quiz:slug}/submit', [QuizController::class, 'submit'])
         ->name('quizzes.submit');
+    
+    Route::get('/quiz/result/{result}', [QuizController::class, 'showResult'])
+        ->name('quizzes.result');
+    Route::post('/quiz/result/{result}/evaluate', [QuizController::class, 'evaluate'])
+        ->name('quizzes.evaluate');
 
     // Redirect old quiz ID URLs to slug URLs
     Route::get('/quiz/{id}/attempt', function ($id) {
@@ -75,6 +81,18 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/requests', [UserController::class, 'requests'])->name('admin.requests');
     // Action to approve
     Route::post('/admin/approve/{user}', [UserController::class, 'approve'])->name('admin.approve');
+    // Action to reject
+    Route::post('/admin/reject/{user}', [UserController::class, 'reject'])->name('admin.reject');
+});
+
+// Question Bank Routes
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/question-bank', [QuestionBankController::class, 'showGenerationForm'])->name('question-bank.form');
+    Route::post('/admin/question-bank/generate', [QuestionBankController::class, 'generateQuestions'])->name('question-bank.generate');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/question-bank/{topic}', [QuestionBankController::class, 'getQuestionsByTopic'])->name('question-bank.topic');
 });
 
 require __DIR__.'/auth.php';

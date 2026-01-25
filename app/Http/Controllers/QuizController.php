@@ -129,46 +129,115 @@ class QuizController extends Controller
         return view('quizzes.attempt',compact('quiz'));
     }
 
-    public function submit(Request $request,Quiz $quiz){
-        // Get answers for form
-        $userAnswers = $request->input('answers',[]);
-        $questions = $quiz->questions;
-
-        $correctCount = 0;
-        $totalQuestions = $questions->count();
-
-        // Loop throuth questions for check correct answer
-        foreach($questions as $question){
-            $submittedAnswer = $userAnswers[$question->id] ?? null;
-
-            if($submittedAnswer === $question->correct_answer){
-                $correctCount++;
-            }
-
-        }
-
-        // calculate percentage
-        $percentage = ($totalQuestions > 0) ? ($correctCount/$totalQuestions) * 100 : 0;
-
-        // save to Database
-        Result::create([
+    public function submit(Request $request, Quiz $quiz)
+    {
+        $userAnswers = $request->input('answers', []);
+        
+        // Create a pending result
+        $result = Result::create([
             'user_id' => auth()->id(),
             'quiz_id' => $quiz->id,
-            'total_questions' => $totalQuestions,
-            'correct_answers' => $correctCount,
-            'score_percentage' => $percentage 
+            'total_questions' => $quiz->questions->count(),
+            'correct_answers' => 0,
+            'score_percentage' => 0,
+            'user_answers' => json_encode($userAnswers),
+            'status' => 'pending'
         ]);
 
-        return view('quizzes.result',[
-            'quiz'       => $quiz,
-            'score'      => $correctCount,
-            'total'      => $totalQuestions,
-            'percentage' => $percentage,
-            'userAnswers' => $userAnswers
-        ]);
-
-        
+        return redirect()->route('quizzes.result', $result->id);
     }
 
+    public function showResult(Result $result)
+    {
+        $result->load('quiz.questions');
+        $data = json_decode($result->user_answers, true) ?: [];
+        
+        // Handle both pending (flat array) and completed (nested array) structures
+        $userAnswers = isset($data['answers']) ? $data['answers'] : $data;
+        $aiEvaluations = isset($data['evaluations']) ? $data['evaluations'] : [];
+        
+        return view('quizzes.result', [
+            'result'      => $result,
+            'quiz'        => $result->quiz,
+            'userAnswers' => $userAnswers,
+            'aiEvaluations' => $aiEvaluations
+        ]);
+    }
 
+    public function evaluate(Result $result, \App\Services\GeminiService $gemini)
+    {
+        if ($result->status === 'completed') {
+            return response()->json([
+                'status' => 'completed',
+                'percentage' => $result->score_percentage,
+                'score' => $result->correct_answers
+            ]);
+        }
+
+        $userAnswers = json_decode($result->user_answers, true) ?: [];
+        $questions = $result->quiz->questions;
+
+        $correctCount = 0;
+        $aiEvaluations = [];
+
+        $stripExtras = function($code) {
+           $code = preg_replace('/<\?php|\?>/', '', $code);
+           $code = preg_replace('!/\*.*?\*/!s', '', $code);
+           $code = preg_replace('!//.*?\n!', "\n", $code);
+           return preg_replace('/\s+/', '', strtolower($code));
+        };
+
+        foreach ($questions as $question) {
+            $submittedAnswer = $userAnswers[$question->id] ?? null;
+            $isCorrect = false;
+
+            if ($question->question_type === 'mcq') {
+                $isCorrect = ($submittedAnswer === $question->correct_answer);
+            } elseif ($question->question_type === 'fill_blank') {
+                $isCorrect = (trim(strtolower($submittedAnswer ?? '')) === trim(strtolower($question->correct_answer)));
+            } elseif ($question->question_type === 'code') {
+                if (empty(trim($submittedAnswer ?? ''))) {
+                    $isCorrect = false;
+                    $aiEvaluations[$question->id] = ['is_correct' => false, 'explanation' => 'No answer provided.'];
+                } else {
+                    $submittedNormalized = $stripExtras($submittedAnswer);
+                    $correctNormalized = $stripExtras($question->correct_answer);
+                    
+                    if ($submittedNormalized === $correctNormalized) {
+                        $isCorrect = true;
+                        $aiEvaluations[$question->id] = ['is_correct' => true, 'explanation' => 'Exact logic match.'];
+                    } else {
+                        $evaluation = $gemini->evaluateCode($question->question_text, $submittedAnswer, $question->correct_answer, $question->hint);
+                        $isCorrect = $evaluation['is_correct'] ?? false;
+                        $aiEvaluations[$question->id] = $evaluation;
+                    }
+                }
+            }
+
+            if ($isCorrect) {
+                $correctCount++;
+            }
+        }
+
+        $totalQuestions = $questions->count();
+        $percentage = ($totalQuestions > 0) ? ($correctCount / $totalQuestions) * 100 : 0;
+
+        $result->update([
+            'correct_answers' => $correctCount,
+            'score_percentage' => $percentage,
+            'status' => 'completed',
+            'user_answers' => json_encode([
+                'answers' => $userAnswers,
+                'evaluations' => $aiEvaluations
+            ])
+        ]);
+
+        return response()->json([
+            'status' => 'completed',
+            'percentage' => round($percentage, 2),
+            'score' => $correctCount,
+            'total' => $totalQuestions,
+            'aiEvaluations' => $aiEvaluations
+        ]);
+    }
 }

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //'admin' for creator and 'user' for student/uesr
-            $table->string('role')->default('user');
+        Schema::table('results', function (Blueprint $table) {
+            $table->text('user_answers')->nullable();
+            $table->string('status')->default('pending');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('results', function (Blueprint $table) {
             //
         });
     }

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('quizzes', function (Blueprint $table) {
-            $table->string('slug')->unique()->after('title');
+        Schema::table('questions', function (Blueprint $table) {
+            $table->text('hint')->nullable()->after('correct_answer');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('quizzes', function (Blueprint $table) {
-            $table->dropColumn('slug');
+        Schema::table('questions', function (Blueprint $table) {
+            //
         });
     }
 };

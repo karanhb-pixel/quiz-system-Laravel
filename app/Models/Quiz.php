@@ -13,6 +13,7 @@ class Quiz extends Model
     protected $fillable = [
         'title',
         'slug',
+        'description',
         'category_id',
         'user_id',
     ];
@@ -41,5 +42,10 @@ class Quiz extends Model
 
     public function questions(){
             return $this->hasMany(Question::class);
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
     }
 }

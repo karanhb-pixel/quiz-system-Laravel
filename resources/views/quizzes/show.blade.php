@@ -47,34 +47,63 @@
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                @foreach (['a','b','c','d'] as $letter )
-
-                                    @php
-                                        // check which letter ans is write 
-                                        $isCorrect = ($question->correct_answer === $letter);
-                                    @endphp
-
-                                    <div class="p-3 rounded-md border {{ $isCorrect ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'bg-gray-50 border-gray-200' }}">
-                                        <div class="flex items-center">
-                                            {{-- A B C D letters --}}
-                                            <span class="font-bold uppercase mr-2 {{ $isCorrect ? 'text-green-700' : 'text-gray-500' }}">
-                                                {{ $letter }}
-                                            </span>
-                                            {{-- Answers from Question table using letter as key --}}
-                                            <span class="{{ $isCorrect ? 'text-green-900 font-medium' : 'text-gray-700' }}">
-                                                {{ $question->$letter }}
-                                            </span>
-
-                                            {{-- svg icon --}}
-                                            @if($isCorrect)
-                                                <svg class="w-4 h-4 ml-auto text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                                </svg>
-                                            @endif
+                                @if($question->question_type === 'mcq')
+                                    @foreach (['a','b','c','d'] as $letter )
+    
+                                        @php
+                                            // check which letter ans is write 
+                                            // Note: for fill_blank, correct_answer is not a letter, so this won't match accidentally
+                                            $isCorrect = ($question->question_type === 'mcq' && $question->correct_answer === $letter);
+                                        @endphp
+    
+                                        <div class="p-3 rounded-md border {{ $isCorrect ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'bg-gray-50 border-gray-200' }}">
+                                            <div class="flex items-center">
+                                                {{-- A B C D letters --}}
+                                                <span class="font-bold uppercase mr-2 {{ $isCorrect ? 'text-green-700' : 'text-gray-500' }}">
+                                                    {{ $letter }}
+                                                </span>
+                                                {{-- Answers from Question table using letter as key --}}
+                                                <span class="{{ $isCorrect ? 'text-green-900 font-medium' : 'text-gray-700' }}">
+                                                    {{ $question->$letter }}
+                                                </span>
+    
+                                                {{-- svg icon --}}
+                                                @if($isCorrect)
+                                                    <svg class="w-4 h-4 ml-auto text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        
+                                    @endforeach
+                                @elseif($question->question_type === 'fill_blank')
+                                    <div class="col-span-1 md:col-span-2 p-4 bg-green-50 border border-green-500 rounded-lg flex items-center">
+                                        <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <div>
+                                            <span class="font-bold text-green-800 uppercase text-sm tracking-wide">Correct Answer:</span>
+                                            <span class="text-green-900 font-semibold ml-1 text-lg">{{ $question->correct_answer }}</span>
                                         </div>
                                     </div>
-                                    
-                                @endforeach
+                                @elseif($question->question_type === 'code')
+                                    <div class="col-span-1 md:col-span-2 p-4 bg-gray-900 border border-gray-700 rounded-lg">
+                                        <div class="flex items-center mb-2">
+                                            <svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                            </svg>
+                                            <span class="font-bold text-gray-300 uppercase text-sm tracking-wide">Expected Solution:</span>
+                                        </div>
+                                        <pre class="text-green-400 font-mono text-sm overflow-x-auto p-2"><code>{{ $question->correct_answer }}</code></pre>
+                                    </div>
+                                @endif
+                                
+                                @if($question->hint)
+                                    <div class="col-span-1 md:col-span-2 mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                                        <span class="font-bold">Evaluation Tip/Hint:</span> {{ $question->hint }}
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         

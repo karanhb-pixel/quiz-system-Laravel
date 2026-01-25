@@ -25,8 +25,12 @@
                                             @foreach($recentResults as $result)
                                             <tr class="border-t">
                                                 <td class="px-4 py-2">{{ $result->quiz->title }}</td>
-                                                <td class="px-4 py-2 font-bold {{ $result->score_percentage >= 50 ? 'text-green-600' : 'text-red-600' }}">
-                                                    {{ $result->score_percentage }}%
+                                                <td class="px-4 py-2 font-bold {{ $result->score_percentage >= 50 && $result->status !== 'pending' ? 'text-green-600' : ($result->status === 'pending' ? 'text-blue-600 animate-pulse' : 'text-red-600') }}">
+                                                    @if($result->status === 'pending')
+                                                        <a href="{{ route('quizzes.result', $result->id) }}" class="underline">Evaluating...</a>
+                                                    @else
+                                                        {{ $result->score_percentage }}%
+                                                    @endif
                                                 </td>
                                                 <td class="px-4 py-2 text-sm text-gray-500">{{ $result->created_at->diffForHumans() }}</td>
                                             </tr>

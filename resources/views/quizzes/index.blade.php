@@ -76,7 +76,7 @@
                                         </td>
                                             <td class="px-6 py-4">
                                                 <form action="
-                                                {{ route('quizzes.destroy', $quiz->id) }}" 
+                                                {{ route('quizzes.destroy', $quiz->slug) }}" 
                                                 method="POST" 
                                                 onsubmit="return confirm('Are you sure you want to delete this?')">
                                                     @csrf

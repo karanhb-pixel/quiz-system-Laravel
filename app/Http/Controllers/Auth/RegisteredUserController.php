@@ -46,10 +46,10 @@ class RegisteredUserController extends Controller
         ]);
 
         if($user->role === 'pending_admin'){
-            Mail::to('main-admin@example.com')->send(new AdminRequestMail($user));
-
-            // Temporary assinging admin strait after impliment mail logic
-            // $user->role = 'admin';
+            $admins = User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                Mail::to($admin->email)->send(new AdminRequestMail($user));
+            }
         }
 
         event(new Registered($user));

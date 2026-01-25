@@ -19,6 +19,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register controller bindings
+        $this->app->bind(
+            \App\Http\Controllers\QuestionBankController::class,
+            function ($app) {
+                return new \App\Http\Controllers\QuestionBankController(
+                    $app->make(\App\QuestionBank\QuestionBankService::class)
+                );
+            }
+        );
     }
 }

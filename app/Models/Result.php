@@ -14,7 +14,9 @@ class Result extends Model
         'quiz_id',
         'total_questions',
         'correct_answers',
-        'score_percentage'
+        'score_percentage',
+        'user_answers',
+        'status'
     ];
 
     public function user() {

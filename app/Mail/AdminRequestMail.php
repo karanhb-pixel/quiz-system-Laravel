@@ -39,14 +39,11 @@ class AdminRequestMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.admin_request',
         );
     }
 
-    public function buid(){
-        return $this->subject('New Admin Access Request.')
-                    ->view('emails.admin_request');
-    }
+
 
     /**
      * Get the attachments for the message.
