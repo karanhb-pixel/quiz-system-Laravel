@@ -215,20 +215,17 @@ Potential future enhancements to the Quiz System include:
 - **Quiz Analytics**: Provide detailed analytics on quiz performance and user engagement.
 - **Quiz Export**: Allow users to export their quizzes and results in various formats.
 
-## Deployment to Railway.app
-
-This project is optimized for deployment on **Railway.app** using the following steps:
+## Deployment to Railway.app (using Nixpacks):
 
 1. **Connect GitHub**: Connect your repository to a new Railway project.
-2. **Add PostgreSQL**: Add a PostgreSQL database service to your project. Railway will automatically inject the `DATABASE_URL`.
-3. **Environment Variables**: Add the following variables in the Railway "Variables" tab:
-    - `APP_KEY`: Generate a key using `php artisan key:generate --show`.
+2. **Add PostgreSQL**: Add a PostgreSQL database service. Railway automatically provides the `DATABASE_URL`.
+3. **Environment Variables**: In your web service "Variables" tab, add:
+    - `APP_KEY`: (Get from your local `.env` or run `php artisan key:generate --show`)
     - `APP_ENV`: `production`
-    - `APP_DEBUG`: `false`
-    - `GEMINI_API_KEY`: Your Google AI Studio key.
-    - `DB_CONNECTION`: `pgsql` (Railway handles the rest via `DATABASE_URL`).
-4. **Build Tool**: Railway uses **Nixpacks** by default. It will automatically detect the `composer.json` and `package.json`, install dependencies, and run `npm run build`.
-5. **Auto-Migrations**: The included `Procfile` ensures that `php artisan migrate --force` runs automatically on every deploy.
+    - `DB_CONNECTION`: `pgsql`
+    - `GEMINI_API_KEY`: Your key from Google AI Studio.
+    - `NIXPACKS_PHP_POST_INSTALL_COMMAND`: `php artisan migrate --force`
+4. **Auto-Deployment**: Railway will detect Laravel, install dependencies, compile assets (`npm run build`), and run migrations automatically.
 
 ## Conclusion
 
