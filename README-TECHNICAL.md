@@ -213,9 +213,9 @@ Potential future enhancements to the Quiz System include:
 - **Quiz Categories**: Allow users to categorize their quizzes for better organization.
 - **Quiz Sharing**: Allow users to share their quizzes with others.
 - **Quiz Analytics**: Provide detailed analytics on quiz performance and user engagement.
-- **Quiz Export**: Allow users to export their quizzes and results in various formats.
+- **Quiz Export**: Allow users to## Deployment to Railway.app (using Railpack/FrankenPHP):
 
-## Deployment to Railway.app (using Nixpacks):
+This project is optimized for Railway's modern **Railpack** engine:
 
 1. **Connect GitHub**: Connect your repository to a new Railway project.
 2. **Add PostgreSQL**: Add a PostgreSQL database service. Railway automatically provides the `DATABASE_URL`.
@@ -224,8 +224,11 @@ Potential future enhancements to the Quiz System include:
     - `APP_ENV`: `production`
     - `DB_CONNECTION`: `pgsql`
     - `GEMINI_API_KEY`: Your key from Google AI Studio.
-    - `NIXPACKS_PHP_POST_INSTALL_COMMAND`: `php artisan migrate --force`
-4. **Auto-Deployment**: Railway will detect Laravel, install dependencies, compile assets (`npm run build`), and run migrations automatically.
+4. **Auto-Deployment**: Railway will automatically:
+    - Install PHP 8.4 and Node.js.
+    - Run `composer install` and `npm run build`.
+    - **Run `php artisan migrate --force`** (Built-in to Railpack).
+    - Start the server using **FrankenPHP** (High performance).
 
 ## Conclusion
 
