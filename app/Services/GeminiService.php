@@ -66,6 +66,7 @@ class GeminiService
             
             return $questions;
         } catch (\Exception $e) {
+            error_log("RAILWAY DEBUG - GEMINI API ERROR: " . $e->getMessage());
             // Log the error and return an empty array
             \Log::error("GEMINI API ERROR: " . $e->getMessage(), [
                 'exception' => get_class($e),
