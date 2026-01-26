@@ -18,13 +18,18 @@ class GeminiService
     public function generateQuestions($topic, $difficulty, $numQuestions = 5, $questionType = 'mcq', $category = null)
     {
         $prompt = $this->buildPrompt($topic, $difficulty, $numQuestions, $questionType, $category);
+        \Log::info("Gemini Requesting Questions for Topic: $topic", [
+            'difficulty' => $difficulty,
+            'numQuestions' => $numQuestions,
+            'prompt' => $prompt
+        ]);
 
         try {
-            // Use the available 2.5 Flash model
+            // Use the available 1.5 Flash model
             $result = Gemini::generativeModel('gemini-1.5-flash')->generateContent($prompt);
             $response = $result->text();
             
-            // Clean up markdown code blocks if present
+            \Log::info("Gemini Raw Response received: " . substr($response, 0, 500) . "...");
             if (strpos($response, '```') !== false) {
                 $response = preg_replace('/^```json\s*|\s*```$/', '', trim($response));
                 // Handle case where it might just be ``` without json or other variants
@@ -52,10 +57,16 @@ class GeminiService
                 $question['difficulty'] = $difficulty;
             }
             
+            \Log::info("Gemini successfully generated metadata for " . count($questions) . " questions.");
+            
             return $questions;
         } catch (\Exception $e) {
             // Log the error and return an empty array
-            \Log::error("Gemini question generation failed: " . $e->getMessage());
+            \Log::error("GEMINI API ERROR: " . $e->getMessage(), [
+                'exception' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
             return [];
         }
     }

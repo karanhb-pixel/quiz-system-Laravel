@@ -21,7 +21,11 @@ class QuestionBankService
         $category = $categoryId ? Category::find($categoryId) : null;
         $categoryName = $category ? $category->name : null;
         
+        \Log::info("Starting QuestionBank generation for category: " . ($categoryName ?? 'none'));
+
         $questions = $this->geminiService->generateQuestions($topic, $difficulty, $numQuestions, $questionType, $categoryName);
+        
+        \Log::info("Received " . count($questions) . " raw questions from Gemini.");
         
         if (empty($questions)) {
             Log::error("No questions generated for topic: $topic");
@@ -103,12 +107,18 @@ class QuestionBankService
                         break;
                 }
                 
+                \Log::info("Successfully stored question: " . substr($question->question_text, 0, 50));
+                
                 $storedQuestions[] = $question;
             } catch (\Exception $e) {
-                Log::error("Failed to store question: " . $e->getMessage());
+                \Log::error("DATABASE STORAGE ERROR for question: " . $e->getMessage(), [
+                    'question_data' => $questionData
+                ]);
                 continue;
             }
         }
+        
+        \Log::info("Total stored questions in this batch: " . count($storedQuestions));
         
         return $storedQuestions;
     }
