@@ -26,9 +26,9 @@ class GeminiService
         error_log("RAILWAY DEBUG: Gemini Requesting Questions for Topic: $topic");
 
         try {
-            // Switched to gemini-pro for universal compatibility
-            error_log("RAILWAY DEBUG: Calling Gemini API with model gemini-pro...");
-            $result = Gemini::generativeModel('gemini-pro')->generateContent($prompt);
+            // Using Gemini 2.5 Flash Lite (as requested by user)
+            error_log("RAILWAY DEBUG: Calling Gemini API with model gemini-2.5-flash-lite...");
+            $result = Gemini::generativeModel('gemini-2.5-flash-lite')->generateContent($prompt);
             $response = $result->text();
             
             error_log("RAILWAY DEBUG: Gemini Raw Response length: " . strlen($response));
@@ -140,8 +140,8 @@ Return ONLY a JSON response: { \"is_correct\": true/false, \"explanation\": \"fe
 
         for ($i = 0; $i < $maxRetries; $i++) {
             try {
-                // Using gemini-pro for evaluation
-                $result = Gemini::generativeModel('gemini-pro')->generateContent($prompt);
+                // Using gemini-2.5-flash-lite for evaluation
+                $result = Gemini::generativeModel('gemini-2.5-flash-lite')->generateContent($prompt);
                 $response = $result->text();
                 
                 if (strpos($response, '```') !== false) {
