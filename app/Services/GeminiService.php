@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Services;
-use Gemini;
+use Gemini\Laravel\Facades\Gemini;
 use Gemini\Client;
 use Gemini\Enums\ModelType;
 use Gemini\Transporters\HttpTransporter;
