@@ -18,41 +18,23 @@ class GeminiService
     public function generateQuestions($topic, $difficulty, $numQuestions = 5, $questionType = 'mcq', $category = null)
     {
         $prompt = $this->buildPrompt($topic, $difficulty, $numQuestions, $questionType, $category);
-        \Log::info("Gemini Requesting Questions for Topic: $topic", [
-            'difficulty' => $difficulty,
-            'numQuestions' => $numQuestions,
-            'prompt' => $prompt
-        ]);
-        error_log("RAILWAY DEBUG: Gemini Requesting Questions for Topic: $topic");
-
         try {
             // Using Gemini 2.5 Flash Lite (as requested by user)
-            error_log("RAILWAY DEBUG: Calling Gemini API with model gemini-2.5-flash-lite...");
             $result = Gemini::generativeModel('gemini-2.5-flash-lite')->generateContent($prompt);
             $response = $result->text();
             
-            error_log("RAILWAY DEBUG: Gemini Raw Response length: " . strlen($response));
-            \Log::info("Gemini Raw Response received: " . substr($response, 0, 500) . "...");
             if (strpos($response, '```') !== false) {
                 $response = preg_replace('/^```json\s*|\s*```$/', '', trim($response));
                 // Handle case where it might just be ``` without json or other variants
                 $response = str_replace(['```json', '```'], '', $response);
             }
 
-            \Log::info("Gemini Raw Response (Cleaned): " . $response);
-
             // Parse the response to ensure it's valid JSON
             $questions = json_decode($response, true);
             
             if (json_last_error() !== JSON_ERROR_NONE) {
-                \Log::error("Gemini JSON Parse Error: " . json_last_error_msg());
-                error_log("RAILWAY DEBUG: Gemini JSON Parse Error: " . json_last_error_msg());
                 throw new \Exception("Failed to parse Gemini response: " . json_last_error_msg());
             }
-
-            error_log("RAILWAY DEBUG: Gemini Parsed Questions Count: " . count($questions));
-            \Log::info("Gemini Parsed Questions Count: " . count($questions));
-            \Log::info("Gemini Parsed Questions: ", $questions);
             
             // Add metadata to each question
             foreach ($questions as &$question) {
@@ -62,17 +44,9 @@ class GeminiService
                 $question['difficulty'] = $difficulty;
             }
             
-            \Log::info("Gemini successfully generated metadata for " . count($questions) . " questions.");
-            
             return $questions;
         } catch (\Exception $e) {
-            error_log("RAILWAY DEBUG - GEMINI API ERROR: " . $e->getMessage());
-            // Log the error and return an empty array
-            \Log::error("GEMINI API ERROR: " . $e->getMessage(), [
-                'exception' => get_class($e),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
-            ]);
+            \Log::error("Gemini question generation failed: " . $e->getMessage());
             return [];
         }
     }
