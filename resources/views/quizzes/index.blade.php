@@ -30,7 +30,7 @@
                             <label class="block text-gray-700 mb-1">Select Category</label>
                             <select name="category_id" class="border-gray-300 rounded shadow-sm w-full ">
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    <option value="{{ $category->id }}">{{ $category->name }} ({{ $category->quizzes_count }} Quizzes)</option>
                                 @endforeach    
                             </select>
                             @error('category_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -52,6 +52,7 @@
                         <tr >
                                 <th class="px-6 py-3">Quiz Name</th>
                                 <th class="px-6 py-3">Category</th>
+                                <th class="px-6 py-3">Questions</th>
                                 @auth
                                     <th class="px-6 py-3">Add Questions</th>
                                     <th class="px-6 py-3">Action</th>
@@ -63,6 +64,7 @@
                                 <tr class="border-b bg-white">
                                         <td class="px-6 py-4 font-medium text-gray-900">{{ $quiz->title }}</td>
                                         <td class="px-6 py-4">{{ $quiz->category->name }}</td>
+                                        <td class="px-6 py-4 font-bold text-blue-600">{{ $quiz->questions_count }}</td>
                                         
                                         @auth
                                         <td class="px-6 py-4">

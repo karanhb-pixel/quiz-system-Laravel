@@ -15,9 +15,10 @@ class QuizController extends Controller
     public function index()
     {
 
-        $categories = Category::get();
+        $categories = Category::withCount('quizzes')->get();
         $quizzes = Quiz::where('user_id', auth()->id())
                         ->with('category')
+                        ->withCount('questions')
                         ->latest()
                         ->get();
 
