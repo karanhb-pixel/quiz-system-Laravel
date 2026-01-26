@@ -22,7 +22,7 @@ class GeminiService
 
         try {
             // Use the available 2.5 Flash model
-            $result = $this->client->generativeModel('models/gemini-2.5-flash')->generateContent($prompt);
+            $result = $this->client->generativeModel('gemini-1.5-flash')->generateContent($prompt);
             $response = $result->text();
             
             // Clean up markdown code blocks if present
@@ -124,8 +124,8 @@ Return ONLY a JSON response: { \"is_correct\": true/false, \"explanation\": \"fe
 
         for ($i = 0; $i < $maxRetries; $i++) {
             try {
-                // Using 2.5-flash as 1.5-flash is missing in this environment
-                $result = $this->client->generativeModel('models/gemini-2.5-flash')->generateContent($prompt);
+                // Using 1.5-flash as 2.5 does not exist
+                $result = $this->client->generativeModel('gemini-1.5-flash')->generateContent($prompt);
                 $response = $result->text();
                 
                 if (strpos($response, '```') !== false) {
