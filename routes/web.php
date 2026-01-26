@@ -10,7 +10,17 @@ use Illuminate\Support\Facades\Route;
 
 
 
-    Route::get('/', [UserController::class, 'dashboard'])->name('dashboard');
+    // TEMPORARY: Remove this after one successful use!
+Route::get('/seed-database-now', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        return "Database Seeded Successfully! You can now log in.";
+    } catch (\Exception $e) {
+        return "Error seeding database: " . $e->getMessage();
+    }
+});
+
+Route::get('/', [UserController::class, 'dashboard'])->name('dashboard');
     
     // category filter List
     Route::get('/category/{category:slug}/quizzes', [QuizController::class, 'showByCategory'])
