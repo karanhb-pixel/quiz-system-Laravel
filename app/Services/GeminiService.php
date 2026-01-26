@@ -23,12 +23,15 @@ class GeminiService
             'numQuestions' => $numQuestions,
             'prompt' => $prompt
         ]);
+        error_log("RAILWAY DEBUG: Gemini Requesting Questions for Topic: $topic");
 
         try {
             // Use the available 1.5 Flash model
+            error_log("RAILWAY DEBUG: Calling Gemini API...");
             $result = Gemini::generativeModel('gemini-1.5-flash')->generateContent($prompt);
             $response = $result->text();
             
+            error_log("RAILWAY DEBUG: Gemini Raw Response length: " . strlen($response));
             \Log::info("Gemini Raw Response received: " . substr($response, 0, 500) . "...");
             if (strpos($response, '```') !== false) {
                 $response = preg_replace('/^```json\s*|\s*```$/', '', trim($response));
@@ -43,9 +46,11 @@ class GeminiService
             
             if (json_last_error() !== JSON_ERROR_NONE) {
                 \Log::error("Gemini JSON Parse Error: " . json_last_error_msg());
+                error_log("RAILWAY DEBUG: Gemini JSON Parse Error: " . json_last_error_msg());
                 throw new \Exception("Failed to parse Gemini response: " . json_last_error_msg());
             }
 
+            error_log("RAILWAY DEBUG: Gemini Parsed Questions Count: " . count($questions));
             \Log::info("Gemini Parsed Questions Count: " . count($questions));
             \Log::info("Gemini Parsed Questions: ", $questions);
             
