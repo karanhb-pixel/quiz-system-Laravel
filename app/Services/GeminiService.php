@@ -12,8 +12,7 @@ class GeminiService
 
     public function __construct()
     {
-        $apiKey = env('GEMINI_API_KEY');
-       $this->client = Gemini::client($apiKey);
+        // Handled by the Gemini facade and config/gemini.php
     }
 
     public function generateQuestions($topic, $difficulty, $numQuestions = 5, $questionType = 'mcq', $category = null)
@@ -22,7 +21,7 @@ class GeminiService
 
         try {
             // Use the available 2.5 Flash model
-            $result = $this->client->generativeModel('gemini-1.5-flash')->generateContent($prompt);
+            $result = Gemini::generativeModel('gemini-1.5-flash')->generateContent($prompt);
             $response = $result->text();
             
             // Clean up markdown code blocks if present
@@ -125,7 +124,7 @@ Return ONLY a JSON response: { \"is_correct\": true/false, \"explanation\": \"fe
         for ($i = 0; $i < $maxRetries; $i++) {
             try {
                 // Using 1.5-flash as 2.5 does not exist
-                $result = $this->client->generativeModel('gemini-1.5-flash')->generateContent($prompt);
+                $result = Gemini::generativeModel('gemini-1.5-flash')->generateContent($prompt);
                 $response = $result->text();
                 
                 if (strpos($response, '```') !== false) {
