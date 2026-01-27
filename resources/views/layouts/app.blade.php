@@ -33,5 +33,6 @@
             </main>
         </div>
         <x-footer/>
+        @stack('scripts')
     </body>
 </html>

@@ -26,7 +26,7 @@
                 <x-add-question :quiz="$quiz"/>
 
                 {{-- AI Generation Status Indicators --}}
-                @if($quiz->generation_status === 'pending' || $quiz->generation_status === 'processing')
+                @if(($quiz->generation_status === 'pending' || $quiz->generation_status === 'processing') && $quiz->questions->isEmpty())
                     <div class="m-4 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center shadow-sm animate-pulse">
                         <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

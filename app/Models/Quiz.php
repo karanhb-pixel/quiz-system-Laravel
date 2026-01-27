@@ -16,6 +16,8 @@ class Quiz extends Model
         'description',
         'category_id',
         'user_id',
+        'generation_status',
+        'generation_error',
     ];
 
     protected static function boot()
