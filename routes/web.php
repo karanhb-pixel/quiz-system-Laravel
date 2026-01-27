@@ -88,7 +88,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 // Question Bank Routes
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/question-bank', [QuestionBankController::class, 'showGenerationForm'])->name('question-bank.form');
-    Route::post('/admin/question-bank/generate', [QuestionBankController::class, 'generateQuestions'])->name('question-bank.generate');
+    Route::post('/admin/question-bank/generate', [QuestionBankController::class, 'generateQuestions'])
+        ->middleware('throttle:ai_generations')
+        ->name('question-bank.generate');
 });
 
 Route::middleware('auth')->group(function () {
