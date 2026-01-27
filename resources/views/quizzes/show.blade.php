@@ -39,9 +39,21 @@
                     </div>
                     @push('scripts')
                     <script>
+                        // Fallback manual refresh every 10 seconds
                         setTimeout(function() {
                             window.location.reload();
-                        }, 5000); // Refresh every 5 seconds
+                        }, 10000); 
+
+                        // Real-time WebSocket refresh
+                        document.addEventListener('DOMContentLoaded', () => {
+                            if (window.Echo) {
+                                window.Echo.channel('quizzes.{{ $quiz->id }}')
+                                    .listen('.QuizGenerationCompleted', (e) => {
+                                        console.log('AI Generation Complete! Reloading...');
+                                        window.location.reload();
+                                    });
+                            }
+                        });
                     </script>
                     @endpush
                 @elseif($quiz->generation_status === 'failed')

@@ -65,6 +65,9 @@ class GenerateQuizQuestionsJob implements ShouldQueue
 
             $quiz->update(['generation_status' => 'completed']);
             Log::info("Successfully generated " . count($questions) . " questions for Quiz ID: {$this->quizId}");
+
+            // Dispatch real-time event for the browser
+            \App\Events\QuizGenerationCompleted::dispatch($this->quizId);
             
         } catch (\Exception $e) {
             $quiz->update([
