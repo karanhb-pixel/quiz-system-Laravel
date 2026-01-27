@@ -19,8 +19,9 @@ class GeminiService
     {
         $prompt = $this->buildPrompt($topic, $difficulty, $numQuestions, $questionType, $category);
         try {
-            // Using Gemini 2.5 Flash Lite (as requested by user)
-            $result = Gemini::generativeModel('gemini-2.5-flash-lite')->generateContent($prompt);
+            // Using configurable model from .env
+            $model = config('gemini.model', 'gemini-2.5-flash-lite');
+            $result = Gemini::generativeModel($model)->generateContent($prompt);
             $response = $result->text();
             
             if (strpos($response, '```') !== false) {
@@ -114,8 +115,9 @@ Return ONLY a JSON response: { \"is_correct\": true/false, \"explanation\": \"fe
 
         for ($i = 0; $i < $maxRetries; $i++) {
             try {
-                // Using gemini-2.5-flash-lite for evaluation
-                $result = Gemini::generativeModel('gemini-2.5-flash-lite')->generateContent($prompt);
+                // Using configurable model from .env
+                $model = config('gemini.model', 'gemini-2.5-flash-lite');
+                $result = Gemini::generativeModel($model)->generateContent($prompt);
                 $response = $result->text();
                 
                 if (strpos($response, '```') !== false) {
