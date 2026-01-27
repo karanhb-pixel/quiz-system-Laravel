@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
@@ -13,7 +14,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::withCount('quizzes')->get();
+        $categories = Category::withCount('quizzes')->paginate(12);
         return view('categories.index',compact('categories'));
     }
 
@@ -38,6 +39,10 @@ class CategoryController extends Controller
         'slug'        => str($validated['name'])->slug(),
         'creator'     => auth()->user()->name, // We know this exists because of your auth middleware
     ]);
+
+        // Clear category caches
+        Cache::forget('dashboard_top_categories');
+        Cache::forget('quiz_index_categories');
 
         return redirect()->route('categories.index')
                         ->with('success','Category Created Successfully!');
@@ -80,6 +85,10 @@ class CategoryController extends Controller
     {
 
         if($category->delete()){
+            // Clear category caches
+            Cache::forget('dashboard_top_categories');
+            Cache::forget('quiz_index_categories');
+            
             return redirect()->route('categories.index')
                         ->with('success','Category Deleted Successfully!');
         }   

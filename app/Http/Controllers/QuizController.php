@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Quiz;
 use App\Models\Result;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class QuizController extends Controller
 {
@@ -15,12 +16,14 @@ class QuizController extends Controller
     public function index()
     {
 
-        $categories = Category::withCount('quizzes')->get();
+        $categories = Cache::remember('quiz_index_categories', 3600, function () {
+            return Category::withCount('quizzes')->get();
+        });
         $quizzes = Quiz::where('user_id', auth()->id())
                         ->with('category')
                         ->withCount('questions')
                         ->latest()
-                        ->get();
+                        ->paginate(15);
 
         return view('quizzes.index',[
             'categories'=>$categories,
@@ -114,7 +117,7 @@ class QuizController extends Controller
                     ->with('user')
                     ->withCount('questions')
                     ->latest()
-                    ->get();
+                    ->paginate(10);
             
             if(!$quizzes || $quizzes->isEmpty()){
                 return redirect()->back()

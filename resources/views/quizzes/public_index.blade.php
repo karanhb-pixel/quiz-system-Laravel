@@ -51,6 +51,10 @@
                     <p class="col-span-3 text-center text-gray-500">No quizzes available in this category yet.</p>
                 @endforelse
             </div>
+
+            <div class="mt-8">
+                {{ $quizzes->links() }}
+            </div>
         </div>
     </div>
 </x-app-layout>

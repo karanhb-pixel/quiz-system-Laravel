@@ -6,16 +6,19 @@ use App\Models\Category;
 use App\Models\Result;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
 {
     
     public function dashboard(){
 
-         $categories = Category::withCount('quizzes')
-                        ->orderBy('quizzes_count','desc')
-                        ->take(5)
-                        ->get();
+         $categories = Cache::remember('dashboard_top_categories', 3600, function () {
+             return Category::withCount('quizzes')
+                            ->orderBy('quizzes_count','desc')
+                            ->take(5)
+                            ->get();
+         });
          $recentResults = Result::where('user_id', auth()->id())
                         ->with('quiz')
                         ->latest()

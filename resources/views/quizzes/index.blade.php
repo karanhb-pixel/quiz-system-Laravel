@@ -103,6 +103,10 @@
                          </tbody>
                     </table>
                 </div>
+                
+                <div class="mt-6">
+                    {{ $quizzes->links() }}
+                </div>
             </div>
         </div>
     </div>
