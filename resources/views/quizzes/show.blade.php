@@ -25,6 +25,42 @@
                 {{-- Add Quiz Question component --}}
                 <x-add-question :quiz="$quiz"/>
 
+                {{-- AI Generation Status Indicators --}}
+                @if($quiz->generation_status === 'pending' || $quiz->generation_status === 'processing')
+                    <div class="m-4 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center shadow-sm animate-pulse">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-blue-700 font-medium">AI is generating questions for you...</p>
+                            <p class="text-blue-600 text-sm">The page will automatically refresh when ready.</p>
+                        </div>
+                    </div>
+                    @push('scripts')
+                    <script>
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 5000); // Refresh every 5 seconds
+                    </script>
+                    @endpush
+                @elseif($quiz->generation_status === 'failed')
+                    <div class="m-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start shadow-sm">
+                        <svg class="h-6 w-6 text-red-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                            <p class="text-red-700 font-bold">AI Generation Failed</p>
+                            <p class="text-red-600 mt-1">{{ $quiz->generation_error ?: 'An unknown error occurred during generation.' }}</p>
+                            <div class="mt-3">
+                                <button onclick="window.location.reload()" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded text-sm transition font-medium border border-red-300">
+                                    Try Refreshing
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <h2 class="text-2xl font-bold m-4">All Questions in {{ $quiz->title }} </h2>
 
                     @forelse ($quiz->questions as $index =>$question )

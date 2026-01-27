@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Quiz;
 use App\QuestionBank\QuestionBankService;
+use App\Jobs\GenerateQuizQuestionsJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models;
@@ -44,32 +45,28 @@ class QuestionBankController extends Controller
             'user_id' => auth()->id(),
         ]);
     
-        // Generate and store questions, associating them with the quiz
-        $questions = $this->questionBankService->generateAndStoreQuestions(
+        // Dispatch to background queue instead of running immediately
+        GenerateQuizQuestionsJob::dispatch(
+            $quiz->id,
             $topic,
             $difficulty,
             $numQuestions,
             $questionType,
-            $categoryId,
-            $quiz->id // Pass the quiz ID to associate questions with the quiz
+            $categoryId
         );
     
         // For view response
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'questions' => $questions,
                 'quiz' => $quiz,
-                'message' => "Generated $numQuestions $questionType questions about $topic with $difficulty difficulty"
+                'message' => "Quiz created! Questions are being generated in the background."
             ]);
         }
     
         // For regular form submission
-        return redirect()->back()->with([
-            'success' => "Generated $numQuestions $questionType questions about $topic with $difficulty difficulty",
-            'generatedQuestions' => $questions,
-            'quiz' => $quiz
-        ]);
+        return redirect()->route('quizzes.show', $quiz->slug)
+                        ->with('success', "Quiz '{$quiz->title}' created! Questions are being generated in the background. Refresh in a few moments to see them.");
     }
 
     public function showGenerationForm()

@@ -7,9 +7,10 @@
 - [x] **Pagination**: Replace `.get()` with `.paginate()` on heavy data listing pages.
 - [x] **N+1 Monitoring**: Install `laravel-query-detector` to identify inefficient queries.
 
-## 2. AI Stability & Performance (Gemini)
+## 2. AI Stability & Performance (Gemini) ✅ COMPLETED
 
-- [ ] **Background Queues**: Move Gemini question generation and code evaluation to Laravel background jobs.
+- [x] **Background Queues**: Move Gemini question generation and code evaluation to Laravel background jobs.
+- [x] **Generation Status**: Real-time feedback for users during background AI generation.
 - [ ] **Evaluation Caching**: Cache AI verdicts for identical code submissions using input hashing.
 - [ ] **Circuit Breaker**: Implement a fallback mechanism for Gemini rate limits (429 errors).
 
