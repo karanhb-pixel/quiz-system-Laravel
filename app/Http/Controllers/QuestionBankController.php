@@ -23,10 +23,12 @@ class QuestionBankController extends Controller
         $request->validate([
             'category_id' => 'required|exists:categories,id',
             'question_type' => 'required|string|in:mcq,fill_blank,code',
-            'topic' => 'required|string|max:255',
+            'topic' => 'required|string|max:255|unique:quizzes,title',
             'difficulty' => 'required|string|in:easy,medium,hard',
             'num_questions' => 'integer|min:1|max:20',
             'instructions' => 'nullable|string|max:1000'
+        ], [
+            'topic.unique' => 'A quiz with this topic name already exists. Please choose a more specific or different topic name.'
         ]);
     
         $categoryId = $request->input('category_id');

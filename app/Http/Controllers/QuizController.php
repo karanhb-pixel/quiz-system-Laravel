@@ -49,13 +49,16 @@ class QuizController extends Controller
             'title'=>[
                 'required',
                 'string',
-                'max:255'
+                'max:255',
+                'unique:quizzes,title'
             ],
             'category_id'=>[
                 'required',
                 'exists:categories,id'
             ]
-            ]);
+        ], [
+            'title.unique' => 'A quiz with this name already exists. Please choose a different title.'
+        ]);
 
 
             $quiz = Quiz::create([
