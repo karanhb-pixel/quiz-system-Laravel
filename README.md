@@ -1,94 +1,146 @@
-# Quiz System
+# 🧠 Advanced AI Quiz System
 
-## Overview
+A high-performance, real-time quiz platform powered by Laravel and Google Gemini AI. This system allows for automated question generation, smart code evaluation, and instant user feedback.
 
-This is a simple quiz system where users can create, take, and manage quizzes. It's designed to help users test their knowledge on various topics and track their progress.
+---
 
-## Features
+## 🚀 Advanced Features & Optimizations
+
+### 🤖 AI Core (Google Gemini)
+
+- **Background Generation**: Questions are generated using background workers (`Laravel Queues`), ensuring the website stays fast while the AI works.
+- **Smart Code Evaluation**: Beyond simple string matching, the AI understands logical correctness in coding answers.
+- **Configurable Models**: Easily switch between `gemini-2.0-flash-lite`, `gemini-1.5-pro`, or lateest models via `.env`.
+- **API Protection**: Built-in rate limiting (`Throttle`) to protect your Gemini API quota from abuse.
+
+### ⚡ Performance & Scalability
+
+- **Real-Time WebSockets**: Integrated with **Laravel Reverb**. Users see AI generation progress and completion alerts instantly without refreshing the page.
+- **Optimized Database**:
+    - Full indexing on heavy columns (`slug`, `user_id`, `category_id`).
+    - Smart pagination on all listing pages.
+    - N+1 query detection enabled for elite-level development.
+- **Redis Infrastructure**: Designed to use Redis for blazing-fast Sessions, Caching, and Queues.
+
+### 🛠️ Infrastructure (Cloud Ready)
+
+- **Railway Optimized**: Pre-configured for deployment with separate services for the Web UI, Background Workers, and WebSocket Server.
+- **Robust Configuration**: Crash-proof environment variables designed for modern CI/CD pipelines.
+
+---
+
+## 📖 Features
 
 ### For Users
 
-- **Create Quizzes**: Users can create their own quizzes on different topics.
-- **Take Quizzes**: Users can attempt quizzes created by others.
-- **View Results**: After completing a quiz, users can see their scores and review their answers.
-- **Track Progress**: Users can view their past quiz attempts and see how they've improved over time.
+- **Instant Quizzes**: Attempt quizzes across various categories.
+- **Real-time Feedback**: Watch the AI build your personalized quiz in real-time.
+- **Progress Tracking**: Detailed history of attempts and score breakdowns.
 
-### For Instructors / Admins
+### For Admins / Instructors
 
-- **AI Question Generator**: Generate high-quality questions for any topic using Google Gemini AI.
-- **Manage Users**: Admins can approve or reject instructor registrations.
-- **Manage Quizzes**: Use varied question types (MCQ, Fill-in-the-blank, and Code-based).
-- **Smart Grading**: AI-powered evaluation for code-based questions that understands logic beyond simple text matching.
+- **AI Question Bank**: Instant generation of MCQ, Fill-in-the-blank, and Coding questions.
+- **Instructor Approval**: Multi-tier user system with admin oversight.
+- **Automated Grading**: Hands-free evaluation for complex coding tasks.
 
-## How to Use
+---
 
-### Getting Started
+## 🛠️ Technical Stack & Architecture
 
-1. **Register**: Create an account to start using the quiz system.
-2. **Login**: Use your credentials to log in.
-3. **Explore**: Browse through available quizzes or create your own.
+### **Core Backend**
 
-### Creating a Quiz
+- **Framework**: [Laravel 12.x](https://laravel.com) (Released 2025)
+- **Runtime**: PHP 8.4+ (Optimized for typed properties and JIT compilation)
+- **Database**:
+    - **SQLite**: Local development (disk-based, no-config)
+    - **Postgres/MySQL**: Production-ready configuration.
+- **Queue/Asynchronous**:
+    - **Connection**: Database (Local) / Redis (Production)
+    - **Worker**: Dedicated background process for heavy AI lifting.
+- **Cache & Sessions**: Optimized for high-speed RAM-based storage.
 
-1. Go to the "Quizzes" section.
-2. Click on "Create Quiz".
-3. Fill in the quiz details, such as the title and category.
-4. Add questions to your quiz.
-5. Save your quiz.
+### **AI Engineering**
 
-### Taking a Quiz
+- **LLM**: Google Gemini `flash-lite-2.5` & `flash-lite-2.0` (Configurable)
+- **Integration**: `google-gemini-php/laravel` for secure API handling.
+- **Robustness**:
+    - **Circuit Breaker Pattern**: Basic retry logic for AI API 429 errors.
+    - **JSON Output Validation**: Automated regex-based cleansing of AI response Markdown code blocks.
 
-1. Go to the "Quizzes" section.
-2. Choose a quiz you want to take.
-3. Click on "Attempt Quiz".
-4. Answer the questions and submit your answers.
-5. View your results and see how you did.
+### **Frontend & UX**
 
-### Viewing Your Progress
+- **Real-time**: [Laravel Reverb](https://reverb.laravel.com) (High-performance WebSocket server)
+- **Engine**: [Vite 6.x](https://vitejs.dev/) for lightning-fast asset bundling.
+- **Style**: [Tailwind CSS 3.4+](https://tailwindcss.com/) for a sleek, premium UI.
+- **State Management**: Alpine.js for lightweight, reactive components.
 
-1. Go to your profile.
-2. Click on "User Quiz Attempts".
-3. See a list of all the quizzes you've taken and your scores.
+### **Quality & Optimization**
 
-## Required Services & Setup
+- **Database Indexing**: Optimized for `O(n)` to `O(log n)` read performance on `slug` searches.
+- **N+1 Prevention**: Integrated `BeyondCode Query Detector` to maintain high performance.
+- **Rate Limiting**: Custom `ai_generations` throttle to protect instructor balances.
 
-To run this project fully, you will need the following services configured:
+---
+
+## 🛠️ Required Services & Setup
 
 1. **Google Gemini API**:
-    - Required for AI Question Generation and Smart Code Grading.
     - Get an API key from [Google AI Studio](https://aistudio.google.com/).
-    - Add it to your `.env` as `GEMINI_API_KEY=your_key_here`.
+    - Add to `.env`: `GEMINI_API_KEY=your_key` and `GEMINI_MODEL=gemini-2.0-flash-lite`.
 
-2. **Email Server (SMTP)**:
-    - Required for Admin access notifications.
-    - For **Development**: Use [Mailpit](https://github.com/axllent/mailpit) (included in Laravel Herd).
-    - For **Production**: Configure an SMTP service like Mailgun, Postmark, or Amazon SES.
+2. **Redis (Recommended)**:
+    - Used for high-speed queues and session management.
+    - Set `QUEUE_CONNECTION=redis` in production.
 
-3. **Database**:
-    - The project is configured for **SQLite** by default (easy to set up), but also supports **MySQL** or **PostgreSQL**.
+3. **Broadcasting (WebSockets)**:
+    - Uses **Laravel Reverb** (included).
+    - Requires `ext-pcntl` and `ext-posix` on your server.
 
-## Installation
+---
+
+## 💻 Local Installation
 
 ### Requirements
 
-- A web server (e.g., Apache, Nginx)
-- PHP (version 8.0 or higher)
-- A database (e.g., MySQL, SQLite)
+- PHP 8.4+
+- Composer
+- Node.js & NPM
+- SQLite (or MySQL/PostgreSQL)
+- Redis (Optional but recommended)
 
 ### Steps
 
-1. **Download the Code**: Get the latest version of the quiz system.
-2. **Set Up the Database**: Create a database and update the configuration file with your database details.
-3. **Run Migrations**: Set up the database tables by running the migration commands.
-4. **Start the Server**: Launch the application on your web server.
-5. **Access the System**: Open your browser and go to the application URL.
-
-## Support
-
-If you have any questions or need help, feel free to reach out. We're here to assist you!
-
-## License
-
-This project is open-source and available for anyone to use and modify.
+1. **Clone & Install**:
+    ```bash
+    composer install
+    npm install && npm run build
+    ```
+2. **Environment**:
+    ```bash
+    copy .env.example .env
+    php artisan key:generate
+    ```
+3. **Database**:
+    ```bash
+    php artisan migrate --seed
+    ```
+4. **Run the Application** (Require 3 terminal windows):
+    - **Terminal 1**: `php artisan serve` (Web Server)
+    - **Terminal 2**: `php artisan queue:work` (AI Background Worker)
+    - **Terminal 3**: `php artisan reverb:start` (Real-time Socket Server)
 
 ---
+
+## 🚢 Deployment (Railway Examples)
+
+For a professional setup, deploy as three separate services using the same repository:
+
+1. **Quiz-Web**: Default Laravel server.
+2. **Quiz-Worker**: Custom Start Command: `php artisan queue:work`.
+3. **Quiz-Websockets**: Custom Start Command: `php artisan reverb:start --host=0.0.0.0 --port=$PORT`.
+
+---
+
+## 🛡️ License
+
+Open-source under the MIT License. Developed with ❤️ for the Laravel community.
